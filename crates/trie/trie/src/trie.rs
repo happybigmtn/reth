@@ -19,6 +19,12 @@ use tracing::{trace, trace_span};
 use crate::metrics::{StateRootMetrics, TrieRootMetrics};
 
 /// `StateRoot` is used to compute the root node of a state trie.
+///
+/// LESSON 17: State Root Calculation - Computing the Merkle Root
+/// This is the main entry point for calculating Ethereum's state root.
+/// It walks through all accounts and their storage, building up the
+/// Merkle Patricia Trie and computing its root hash. This root is what
+/// gets included in block headers!
 #[derive(Debug)]
 pub struct StateRoot<T, H> {
     /// The factory for trie cursors.

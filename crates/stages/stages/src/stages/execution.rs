@@ -36,6 +36,12 @@ use super::missing_static_data_error;
 /// The execution stage executes all transactions and
 /// update history indexes.
 ///
+/// LESSON 19: Execution Stage - Where Transactions Get Processed
+/// This is where the real work happens! After downloading headers and bodies,
+/// this stage executes every transaction, updating account balances, contract
+/// storage, and producing receipts. It's the most computationally intensive
+/// stage and where state transitions occur.
+///
 /// Input tables:
 /// - [`tables::CanonicalHeaders`] get next block to execute.
 /// - [`tables::Headers`] get for revm environment variables.

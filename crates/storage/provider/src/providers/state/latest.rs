@@ -24,6 +24,12 @@ use reth_trie_db::{
 /// State provider over latest state that takes tx reference.
 ///
 /// Wraps a [`DBProvider`] to get access to database.
+// LESSON 10: Latest State Provider
+// This provides access to the current (latest) blockchain state.
+// It reads directly from the PlainAccountState and PlainStorageState tables,
+// which always contain the most recent state after all blocks have been executed.
+// 
+// Key insight: "Latest" means the state after the highest block in the database.
 #[derive(Debug)]
 pub struct LatestStateProviderRef<'b, Provider>(&'b Provider);
 

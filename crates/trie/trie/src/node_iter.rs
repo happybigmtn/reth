@@ -44,6 +44,11 @@ struct SeekedHashedEntry<V> {
 }
 
 /// An iterator over existing intermediate branch nodes and updated leaf nodes.
+///
+/// LESSON 18: Node Iterator - Combining Trie Structure with Account Data
+/// This iterator is the heart of state root calculation. It walks the trie
+/// structure while simultaneously iterating through hashed account/storage data.
+/// It yields branch nodes from the trie and leaf nodes with actual account data!
 #[derive(Debug)]
 pub struct TrieNodeIter<C, H: HashedCursor> {
     /// The walker over intermediate nodes.

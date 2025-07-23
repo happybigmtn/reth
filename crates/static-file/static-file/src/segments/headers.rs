@@ -30,6 +30,11 @@ where
         let mut static_file_writer =
             static_file_provider.get_writer(*block_range.start(), StaticFileSegment::Headers)?;
 
+        // LESSON 11: Moving Headers to Static Files
+        // We need to read from three tables to get complete header data:
+        // 1. Headers - The actual header data
+        // 2. HeaderTerminalDifficulties - Total difficulty (for pre-merge)
+        // 3. CanonicalHeaders - Which headers are canonical
         let mut headers_cursor = provider
             .tx_ref()
             .cursor_read::<tables::Headers<<Provider::Primitives as NodePrimitives>::BlockHeader>>(

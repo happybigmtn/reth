@@ -10,6 +10,13 @@
 //!
 //! The [`RpcServerConfig`] is used to assemble and start the http server, ws server, ipc servers,
 //! it requires the [`TransportRpcModules`] so it can start the servers with the configured modules.
+//! 
+//! LESSON 13: RPC Module Builder - Composing the API Surface
+//! The builder pattern allows flexible RPC configuration:
+//! - Select which namespaces to expose (eth, net, web3, etc)
+//! - Configure transport-specific APIs (HTTP vs WebSocket vs IPC)
+//! - Add middleware for authentication, rate limiting, metrics
+//! - Handle CORS and security settings
 
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/paradigmxyz/reth/main/assets/reth-docs.png",

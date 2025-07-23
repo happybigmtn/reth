@@ -1,4 +1,12 @@
 //! Transaction validation abstractions.
+//!
+//! LESSON 14: Transaction Validation - The Gatekeeper
+//! Before entering the pool, every transaction must pass validation:
+//! 1. Signature verification (is it really from the sender?)
+//! 2. Nonce check (is it the right order?)
+//! 3. Balance check (can they afford gas + value?)
+//! 4. Gas limit check (not exceeding block limit)
+//! 5. Fee check (meeting minimum requirements)
 
 use crate::{
     error::InvalidPoolTransactionError,

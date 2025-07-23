@@ -23,6 +23,10 @@ pub mod compact_ids {
 }
 
 /// An Ethereum account.
+// LESSON 5: The Core Account Structure
+// This is different from the 4-field account in the lesson! Reth stores only 3 fields here.
+// The storage_root is kept separately in the TrieAccount structure for efficiency.
+// This separation allows updating account balance/nonce without touching storage.
 #[cfg_attr(any(test, feature = "serde"), derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 #[cfg_attr(any(test, feature = "arbitrary"), derive(arbitrary::Arbitrary))]
@@ -30,10 +34,22 @@ pub mod compact_ids {
 #[cfg_attr(any(test, feature = "reth-codec"), reth_codecs::add_arbitrary_tests(compact))]
 pub struct Account {
     /// Account nonce.
+    // LESSON 5: Nonce Details
+    // - For EOAs: counts transactions sent
+    // - For contracts: usually 1 (set during creation)
+    // - Prevents replay attacks by ensuring each tx is unique
     pub nonce: u64,
     /// Account balance.
+    // LESSON 5: Balance in Wei
+    // U256 because balances can be huge (total ETH supply = ~120M ETH = 1.2 * 10^26 wei)
+    // A u64 max is only ~1.8 * 10^19, not nearly enough!
     pub balance: U256,
     /// Hash of the account's bytecode.
+    // LESSON 5: Smart Contract Code
+    // Option<B256> because:
+    // - None = EOA (no code)
+    // - Some(hash) = Contract account
+    // We store the hash, not the code itself, for efficiency
     pub bytecode_hash: Option<B256>,
 }
 
@@ -45,6 +61,12 @@ impl Account {
 
     /// After `SpuriousDragon` empty account is defined as account with nonce == 0 && balance == 0
     /// && bytecode = None (or hash is [`KECCAK_EMPTY`]).
+    // LESSON 5: Empty Account Definition
+    // Empty accounts are removed from state to save space. An account is empty if:
+    // 1. No transactions sent (nonce = 0)
+    // 2. No balance
+    // 3. No code (or empty code hash)
+    // This changed in SpuriousDragon hardfork to fix DoS attacks
     pub fn is_empty(&self) -> bool {
         self.nonce == 0 &&
             self.balance.is_zero() &&
@@ -58,6 +80,12 @@ impl Account {
     }
 
     /// Converts the account into a trie account with the given storage root.
+    // LESSON 5: Account vs TrieAccount
+    // TrieAccount includes storage_root - this is the full 4-field account from the lesson!
+    // Reth separates them because:
+    // 1. Account updates (balance/nonce) are frequent
+    // 2. Storage updates are separate
+    // 3. We only need the full TrieAccount when computing state roots
     pub fn into_trie_account(self, storage_root: B256) -> TrieAccount {
         let Self { nonce, balance, bytecode_hash } = self;
         TrieAccount {

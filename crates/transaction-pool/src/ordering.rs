@@ -1,3 +1,8 @@
+// LESSON 14: Transaction Ordering - Who Goes First?
+// The pool needs to decide which transactions to include in blocks.
+// By default, it uses the "coinbase tip" - how much the miner/validator gets.
+// Higher tips = higher priority. It's like tipping for faster service!
+
 use crate::traits::PoolTransaction;
 use alloy_primitives::U256;
 use std::{cmp::Ordering, fmt::Debug, marker::PhantomData};

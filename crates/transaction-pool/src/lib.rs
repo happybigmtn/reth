@@ -2,6 +2,11 @@
 //!
 //! This crate provides a generic transaction pool implementation.
 //!
+//! LESSON 14: Transaction Pool - The Mempool Heart
+//! The transaction pool is where pending transactions wait to be included in blocks.
+//! It's like a waiting room at a doctor's office - transactions queue up and 
+//! the best ones (highest fees) get seen first!
+//!
 //! ## Functionality
 //!
 //! The transaction pool is responsible for

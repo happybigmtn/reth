@@ -56,6 +56,13 @@ pub type EthApiBuilderFor<N> = EthApiBuilder<
 /// This way [`EthApi`] is not limited to [`jsonrpsee`] and can be used standalone or in other
 /// network handlers (for example ipc).
 ///
+/// LESSON 13: The EthApi - Core RPC Implementation
+/// This is the main handler for Ethereum JSON-RPC requests. It combines:
+/// - Provider: Database access for blockchain data
+/// - Pool: Transaction pool for pending transactions  
+/// - Network: P2P network state
+/// - EvmConfig: EVM configuration for execution
+///
 /// ## Trait requirements
 ///
 /// While this type requires various unrestricted generic components, trait bounds are enforced when

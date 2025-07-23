@@ -7,6 +7,11 @@ use crate::{
         cached_state::CachedStateProvider, executor::WorkloadExecutor, metrics::EngineApiMetrics,
     },
 };
+
+// LESSON 20: Engine Tree - Managing Forks and Consensus Integration
+// This module implements the core logic for handling multiple chain forks,
+// managing the canonical chain, and integrating with the beacon chain's
+// consensus through the Engine API. It's where reorgs get processed!
 use alloy_consensus::BlockHeader;
 use alloy_eips::{merge::EPOCH_SLOTS, BlockNumHash, NumHash};
 use alloy_evm::block::BlockExecutor;

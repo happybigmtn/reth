@@ -194,6 +194,12 @@ pub struct UnwindOutput {
 /// Stages are executed as part of a pipeline where they are executed serially.
 ///
 /// Stages receive [`DBProvider`](reth_provider::DBProvider).
+///
+/// LESSON 19: Stage Trait - The Building Block of Staged Sync
+/// This trait defines the contract that all sync stages must implement.
+/// Each stage is responsible for a specific part of blockchain sync
+/// (headers, bodies, execution, etc.) and must be able to both execute
+/// forward and unwind backward for handling reorgs!
 #[auto_impl::auto_impl(Box)]
 pub trait Stage<Provider>: Send + Sync {
     /// Get the ID of the stage.

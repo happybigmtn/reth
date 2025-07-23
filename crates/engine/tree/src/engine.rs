@@ -22,6 +22,11 @@ use tokio::sync::mpsc::UnboundedReceiver;
 
 /// A [`ChainHandler`] that advances the chain based on incoming requests (CL engine API).
 ///
+/// LESSON 15: Engine Handler - Orchestrating Consensus and Execution
+/// This handler receives messages from the consensus layer (like "here's a new block" 
+/// or "switch to this fork") and coordinates the execution layer's response.
+/// It's like a dispatcher that routes consensus commands to the right handlers.
+///
 /// This is a general purpose request handler with network access.
 /// This type listens for incoming messages and processes them via the configured request handler.
 ///

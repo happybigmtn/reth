@@ -2,6 +2,11 @@ use alloy_primitives::B256;
 use alloy_rpc_types_engine::{ForkchoiceState, PayloadStatusEnum};
 
 /// The struct that keeps track of the received forkchoice state and their status.
+///
+/// LESSON 20: Forkchoice State Tracker - Beacon Chain Integration
+/// This tracks forkchoice updates from the beacon chain, managing which
+/// blocks are considered canonical. It's how the execution layer learns
+/// about reorgs and finalization from the consensus layer!
 #[derive(Debug, Clone, Default)]
 pub struct ForkchoiceStateTracker {
     /// The latest forkchoice state that we received.

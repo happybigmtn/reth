@@ -2,6 +2,12 @@
 //!
 //! Provides the implementation of all RPC interfaces.
 //!
+//! LESSON 13: RPC Server Architecture - External API Gateway
+//! The RPC server is how external clients interact with the node:
+//! - Query blockchain state (eth_getBalance, eth_call)
+//! - Submit transactions (eth_sendRawTransaction)
+//! - Subscribe to events (newHeads, logs)
+//! - Debug and trace execution
 //!
 //! ## Note on blocking behaviour
 //!

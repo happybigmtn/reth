@@ -4,6 +4,11 @@ use alloy_primitives::BlockNumber;
 /// Determines the control flow during pipeline execution.
 ///
 /// See [`Pipeline::run_loop`](crate::Pipeline::run_loop) for more information.
+///
+/// LESSON 20: Pipeline Control Flow - Handling Reorgs in Staged Sync
+/// This enum controls how the pipeline responds to different situations,
+/// especially when reorgs are detected. The Unwind variant triggers
+/// the staged sync unwinding process to handle chain reorganizations!
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ControlFlow {
     /// An unwind was requested and must be performed before continuing.

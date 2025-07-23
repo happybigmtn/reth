@@ -8,6 +8,14 @@ use reth_payload_primitives::PayloadAttributesBuilder;
 use std::sync::Arc;
 
 /// The attributes builder for local Ethereum payload.
+///
+/// LESSON 15: Payload Attributes - Instructions for Block Building
+/// When building a new block, the consensus layer provides attributes:
+/// - timestamp: When the block should be created
+/// - prev_randao: Randomness from the beacon chain
+/// - suggested_fee_recipient: Where to send transaction fees
+/// - withdrawals: Validator withdrawals (post-Shanghai)
+/// - parent_beacon_block_root: Beacon chain reference (post-Cancun)
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct LocalPayloadAttributesBuilder<ChainSpec> {

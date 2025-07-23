@@ -1,4 +1,12 @@
 //! Transaction wrapper for libmdbx-sys.
+//! 
+//! LESSON 9: Database Transactions - The Heart of ACID
+//! Transactions are the fundamental unit of work in a database.
+//! They provide ACID guarantees:
+//! - Atomicity: All operations succeed or all fail
+//! - Consistency: Database remains valid after transaction
+//! - Isolation: Concurrent transactions don't interfere
+//! - Durability: Committed changes survive crashes
 
 use super::{cursor::Cursor, utils::*};
 use crate::{
@@ -23,9 +31,19 @@ use std::{
 };
 
 /// Duration after which we emit the log about long-lived database transactions.
+// LESSON 9: Long Transaction Detection
+// Long-running read transactions are problematic in MDBX because they prevent
+// garbage collection. If a reader holds a transaction open for too long,
+// the database can't reclaim space from deleted data.
 const LONG_TRANSACTION_DURATION: Duration = Duration::from_secs(60);
 
 /// Wrapper for the libmdbx transaction.
+// LESSON 9: Transaction Types - Read vs Write
+// The `K: TransactionKind` generic parameter can be:
+// - RO (Read-Only): Multiple concurrent readers allowed
+// - RW (Read-Write): Exclusive access, only one writer at a time
+// 
+// This is enforced at compile time through Rust's type system!
 #[derive(Debug)]
 pub struct Tx<K: TransactionKind> {
     /// Libmdbx-sys transaction.
@@ -277,10 +295,16 @@ impl<K: TransactionKind> Drop for MetricsHandler<K> {
 
 impl TableImporter for Tx<RW> {}
 
+// LESSON 9: Read Transaction Operations
+// The DbTx trait provides the core read operations for transactions.
+// All transaction types (RO and RW) can perform reads.
 impl<K: TransactionKind> DbTx for Tx<K> {
     type Cursor<T: Table> = Cursor<K, T>;
     type DupCursor<T: DupSort> = Cursor<K, T>;
 
+    // LESSON 9: Point Lookups
+    // The most basic operation - get a single value by key.
+    // This is O(log n) in MDBX due to B+ tree structure.
     fn get<T: Table>(&self, key: T::Key) -> Result<Option<<T as Table>::Value>, DatabaseError> {
         self.get_by_encoded_key::<T>(&key.encode())
     }
@@ -297,6 +321,9 @@ impl<K: TransactionKind> DbTx for Tx<K> {
         })
     }
 
+    // LESSON 9: Transaction Commit
+    // Commit makes all changes permanent. For read transactions, this is a no-op.
+    // For write transactions, this flushes changes to disk (durability).
     fn commit(self) -> Result<bool, DatabaseError> {
         self.execute_with_close_transaction_metric(TransactionOutcome::Commit, |this| {
             match this.inner.commit().map_err(|e| DatabaseError::Commit(e.into())) {
@@ -306,6 +333,9 @@ impl<K: TransactionKind> DbTx for Tx<K> {
         })
     }
 
+    // LESSON 9: Transaction Abort
+    // Abort discards all changes. This is automatic if a transaction
+    // is dropped without commit, but explicit abort is clearer.
     fn abort(self) {
         self.execute_with_close_transaction_metric(TransactionOutcome::Abort, |this| {
             (drop(this.inner), None)
@@ -342,13 +372,19 @@ impl<K: TransactionKind> DbTx for Tx<K> {
     }
 }
 
+// LESSON 9: Write Transaction Operations
+// Only RW transactions can implement DbTxMut for write operations.
+// Write transactions have exclusive access - only one at a time!
 impl DbTxMut for Tx<RW> {
     type CursorMut<T: Table> = Cursor<RW, T>;
     type DupCursorMut<T: DupSort> = Cursor<RW, T>;
 
+    // LESSON 9: Put Operation - Insert or Update
+    // MDBX uses MVCC (Multi-Version Concurrency Control), so writes don't
+    // block readers. The new data becomes visible only after commit.
     fn put<T: Table>(&self, key: T::Key, value: T::Value) -> Result<(), DatabaseError> {
         let key = key.encode();
-        let value = value.compress();
+        let value = value.compress();  // Apply compression before storage
         self.execute_with_operation_metric::<T, _>(
             Operation::Put,
             Some(value.as_ref().len()),

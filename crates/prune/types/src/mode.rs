@@ -2,6 +2,11 @@ use crate::{segment::PrunePurpose, PruneSegment, PruneSegmentError};
 use alloy_primitives::BlockNumber;
 
 /// Prune mode.
+///
+/// LESSON 21: Pruning Modes - Different Strategies for Data Retention
+/// These modes control how much historical data to keep. 'Distance' keeps
+/// the last N blocks, 'Before' keeps everything before a specific block,
+/// and 'Full' removes everything possible while maintaining node functionality.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(any(test, feature = "test-utils"), derive(arbitrary::Arbitrary))]
 #[cfg_attr(any(test, feature = "reth-codec"), derive(reth_codecs::Compact))]

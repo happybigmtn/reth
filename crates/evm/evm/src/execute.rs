@@ -29,6 +29,13 @@ use revm::{
 
 /// A type that knows how to execute a block. It is assumed to operate on a
 /// [`crate::Evm`] internally and use [`State`] as database.
+///
+/// LESSON 16: Block Executor - Running All Transactions in a Block
+/// The executor processes blocks transaction by transaction:
+/// 1. Load initial state from database
+/// 2. Execute each transaction, updating state
+/// 3. Apply block rewards
+/// 4. Return receipts and final state changes
 pub trait Executor<DB: Database>: Sized {
     /// The primitive types used by the executor.
     type Primitives: NodePrimitives;

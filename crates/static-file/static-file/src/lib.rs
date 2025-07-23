@@ -1,4 +1,13 @@
 //! Static file producer implementation.
+//! 
+//! LESSON 11: Static Files - Efficient Immutable Storage
+//! Static files store finalized blockchain data that never changes.
+//! Instead of keeping everything in the database, we move immutable data
+//! (headers, bodies, receipts) to append-only files. Benefits:
+//! - Better compression ratios
+//! - Faster sequential reads  
+//! - Reduced database size
+//! - Memory-mapped access
 
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/paradigmxyz/reth/main/assets/reth-docs.png",

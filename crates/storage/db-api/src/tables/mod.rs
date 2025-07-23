@@ -7,9 +7,17 @@
 //! - [`codecs`] integrates different codecs into [`Encode`] and [`Decode`]
 //! - [`models`](crate::models) defines the values written to tables
 //!
-//! # Database Tour
-//!
-//! TODO(onbjerg): Find appropriate format for this...
+//! LESSON 7: Database Schema Definition
+//! This is where all of Reth's database tables are defined. Each table has:
+//! - A unique name (used as the table identifier in MDBX)
+//! - A key type (what we search by)
+//! - A value type (what we store)
+//! - Optional subkey for DupSort tables (tables with duplicate keys)
+//! 
+//! The schema is carefully designed for:
+//! - Efficient queries (keys are ordered for range scans)
+//! - Space efficiency (deduplication, compression)
+//! - Type safety (can't put wrong data in tables)
 
 pub mod codecs;
 
@@ -301,24 +309,36 @@ macro_rules! tables {
 
 tables! {
     /// Stores the header hashes belonging to the canonical chain.
+    // LESSON 7: Canonical Chain Tracking
+    // This table maps block number → hash for the canonical (main) chain.
+    // When reorgs happen, this table is updated to point to the new canonical blocks.
     table CanonicalHeaders {
         type Key = BlockNumber;
         type Value = HeaderHash;
     }
 
     /// Stores the total difficulty from a block header.
+    // LESSON 7: Terminal Difficulty for The Merge
+    // This tracked total difficulty until The Merge. Post-merge, difficulty is always 0.
+    // Kept for historical blocks and consensus verification.
     table HeaderTerminalDifficulties {
         type Key = BlockNumber;
         type Value = CompactU256;
     }
 
     /// Stores the block number corresponding to a header.
+    // LESSON 7: Hash to Number Mapping
+    // Reverse lookup: given a block hash, find its height.
+    // Essential for RPC methods like eth_getBlockByHash.
     table HeaderNumbers {
         type Key = BlockHash;
         type Value = BlockNumber;
     }
 
     /// Stores header bodies.
+    // LESSON 7: Generic Header Storage
+    // Generic over H to support different header types (Ethereum, Optimism, etc.)
+    // Headers are accessed frequently, so they're stored separately from bodies.
     table Headers<H = Header> {
         type Key = BlockNumber;
         type Value = H;
@@ -327,30 +347,45 @@ tables! {
     /// Stores block indices that contains indexes of transaction and the count of them.
     ///
     /// More information about stored indices can be found in the [`StoredBlockBodyIndices`] struct.
+    // LESSON 7: Block Body Indices
+    // Instead of storing full bodies, we store indices pointing to transactions.
+    // This enables deduplication - transactions are stored once and referenced.
     table BlockBodyIndices {
         type Key = BlockNumber;
         type Value = StoredBlockBodyIndices;
     }
 
     /// Stores the uncles/ommers of the block.
+    // LESSON 7: Uncle/Ommer Storage
+    // Pre-merge, miners could include uncle blocks for partial rewards.
+    // Post-merge, this is always empty but kept for historical data.
     table BlockOmmers<H = Header> {
         type Key = BlockNumber;
         type Value = StoredBlockOmmers<H>;
     }
 
     /// Stores the block withdrawals.
+    // LESSON 7: Staking Withdrawals (Post-Shanghai)
+    // Validators can withdraw staking rewards and principal.
+    // Each block can contain multiple withdrawals.
     table BlockWithdrawals {
         type Key = BlockNumber;
         type Value = StoredBlockWithdrawals;
     }
 
     /// Canonical only Stores the transaction body for canonical transactions.
+    // LESSON 7: Transaction Storage with Global Numbering
+    // Transactions get a global TxNumber for efficient indexing.
+    // This allows deduplication and fast range queries.
     table Transactions<T = TransactionSigned> {
         type Key = TxNumber;
         type Value = T;
     }
 
     /// Stores the mapping of the transaction hash to the transaction number.
+    // LESSON 7: Transaction Hash Index
+    // Two-step lookup: Hash → TxNumber → Transaction
+    // Saves space since hash is stored only once.
     table TransactionHashNumbers {
         type Key = TxHash;
         type Value = TxNumber;
@@ -359,12 +394,18 @@ tables! {
     /// Stores the mapping of transaction number to the blocks number.
     ///
     /// The key is the highest transaction ID in the block.
+    // LESSON 7: Transaction to Block Mapping
+    // Key insight: We store the LAST tx number in each block.
+    // To find a tx's block: seek to the first key >= tx_number.
     table TransactionBlocks {
         type Key = TxNumber;
         type Value = BlockNumber;
     }
 
     /// Canonical only Stores transaction receipts.
+    // LESSON 7: Receipt Storage
+    // Receipts contain execution results: status, gas used, logs.
+    // Stored by TxNumber for consistency with transactions.
     table Receipts<R = Receipt> {
         type Key = TxNumber;
         type Value = R;
@@ -374,18 +415,28 @@ tables! {
     /// There will be multiple accounts that have same bytecode
     /// So we would need to introduce reference counter.
     /// This will be small optimization on state.
+    // LESSON 7: Bytecode Deduplication
+    // Many contracts share bytecode (e.g., proxy contracts, token contracts).
+    // We store each unique bytecode once, keyed by its hash.
     table Bytecodes {
         type Key = B256;
         type Value = Bytecode;
     }
 
     /// Stores the current state of an [`Account`].
+    // LESSON 7: Current Account State
+    // "Plain" means unhashed addresses (vs HashedAccountState for tries).
+    // This is the latest state - what eth_getBalance returns.
     table PlainAccountState {
         type Key = Address;
         type Value = Account;
     }
 
     /// Stores the current value of a storage key.
+    // LESSON 7: Contract Storage - DupSort Table
+    // This is a DupSort table: multiple storage slots per address.
+    // Key = Address, SubKey = StorageKey (B256)
+    // Enables efficient "get all storage for address" queries.
     table PlainStorageState {
         type Key = Address;
         type Value = StorageEntry;
@@ -409,6 +460,10 @@ tables! {
     /// * If there were no shard we would get `None` entry or entry of different storage key.
     ///
     /// Code example can be found in `reth_provider::HistoricalStateProviderRef`
+    // LESSON 7: Sharded History Index
+    // ShardedKey = (Address, HighestBlockInShard)
+    // Value = List of blocks where this account changed
+    // Sharding improves query performance for "what did account X look like at block Y?"
     table AccountsHistory {
         type Key = ShardedKey<Address>;
         type Value = BlockNumberList;

@@ -39,6 +39,13 @@ impl ChangedAccount {
 
 /// Represents the outcome of block execution, including post-execution changes and reverts.
 ///
+/// LESSON 16: Execution Outcome - What Happens After Running Transactions
+/// After executing a block, we need to track:
+/// - State changes (account balances, storage, new contracts)
+/// - Receipts (proof of what happened in each transaction)
+/// - Reverts (for handling reorgs)
+/// - Requests (withdrawals, consolidations, etc)
+///
 /// The `ExecutionOutcome` structure aggregates the state changes over an arbitrary number of
 /// blocks, capturing the resulting state, receipts, and requests following the execution.
 #[derive(Debug, Clone, PartialEq, Eq)]

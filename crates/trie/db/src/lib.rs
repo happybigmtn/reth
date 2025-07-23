@@ -1,4 +1,9 @@
 //! An integration of [`reth-trie`] with [`reth-db`].
+//!
+//! LESSON 17: Trie Database Integration - Connecting Tries to Storage
+//! This module bridges the gap between the abstract trie algorithms and
+//! the actual database. It provides cursors for navigating trie nodes
+//! stored in the database and methods for computing state roots.
 
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 

@@ -133,6 +133,14 @@ impl<DB: Database, N: NodeTypes> From<DatabaseProviderRW<DB, N>>
 
 /// A provider struct that fetches data from the database.
 /// Wrapper around [`DbTx`] and [`DbTxMut`]. Example: [`HeaderProvider`] [`BlockHashReader`]
+// LESSON 10: The DatabaseProvider - Central Storage Abstraction
+// This is the main interface for accessing blockchain data. It combines:
+// 1. Database transaction (for state/indices)
+// 2. Static file provider (for headers/bodies/receipts)
+// 3. Chain spec (for consensus rules)
+// 4. Pruning modes (for data retention)
+// 
+// The provider pattern abstracts away whether data comes from DB or static files.
 #[derive(Debug)]
 pub struct DatabaseProvider<TX, N: NodeTypes> {
     /// Database transaction.
@@ -368,6 +376,12 @@ impl<TX: DbTx + DbTxMut + 'static, N: NodeTypesForProvider> DatabaseProvider<TX,
     }
 }
 
+// LESSON 10: Historical State Access
+// The provider can create state providers for any historical block.
+// This is crucial for:
+// - eth_call at specific blocks
+// - Debugging transaction execution
+// - Proving historical state
 impl<TX: DbTx + 'static, N: NodeTypes> TryIntoHistoricalStateProvider for DatabaseProvider<TX, N> {
     fn try_into_history_at_block(
         self,

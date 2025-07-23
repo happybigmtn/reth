@@ -2,8 +2,25 @@
 //!
 //! This crate contains Ethereum primitive types and helper functions.
 //!
+//! LESSON 2: The Primitives Crate - Your Type System Toolbox
+//! This is where all the fundamental types live. Think of it as the "standard library"
+//! for Ethereum types. Every other part of Reth builds on these primitives.
+//! 
+//! Just like how in physics we have fundamental particles (electrons, protons, neutrons),
+//! in Ethereum we have fundamental types:
+//! - Addresses (20 bytes) - where accounts live
+//! - Hashes (32 bytes) - unique identifiers for data
+//! - Numbers (U256) - for balances, nonces, gas
+//! - Transactions - the messages that change state
+//! - Blocks - containers of transactions
+//! - Receipts - proof that transactions were executed
+//!
 //! ## Feature Flags
 //!
+//! LESSON 2: Rust's Feature Flags - Conditional Compilation
+//! Feature flags let us include or exclude code at compile time.
+//! It's like having different versions of a recipe - basic or gourmet!
+//! 
 //! - `arbitrary`: Adds `proptest` and `arbitrary` support for primitive types.
 //! - `test-utils`: Export utilities for testing
 //! - `reth-codec`: Enables db codec support for reth types including zstd compression for certain
@@ -29,6 +46,10 @@ pub use block::{Block, BlockBody, SealedBlock};
 pub use block::{BlockWithSenders, SealedBlockFor, SealedBlockWithSenders};
 
 pub use receipt::{gas_spent_by_transactions, Receipt};
+// LESSON 2: Re-exports - The Power of a Unified Interface
+// Rust lets us re-export types from other crates. This is brilliant!
+// Users only need to import from reth_primitives, not remember dozens of crate names.
+// It's like having one phone number that connects you to all departments.
 pub use reth_primitives_traits::{
     logs_bloom, Account, BlockTy, BodyTy, Bytecode, GotExpected, GotExpectedBoxed, Header,
     HeaderTy, Log, LogData, NodePrimitives, ReceiptTy, RecoveredBlock, SealedHeader, StorageEntry,
@@ -36,12 +57,20 @@ pub use reth_primitives_traits::{
 };
 pub use static_file::StaticFileSegment;
 
+// LESSON 2: Alloy - The Shared Foundation
+// Alloy is like the "standard library" for Ethereum in Rust.
+// Multiple projects (Reth, Foundry, etc.) use these same types.
+// This ensures compatibility - like how all electrical plugs follow a standard!
 pub use alloy_consensus::{
     transaction::{PooledTransaction, Recovered, TransactionMeta},
     ReceiptWithBloom,
 };
 
 /// Recovered transaction
+// LESSON 2: Deprecation in Rust
+// The #[deprecated] attribute is like putting a "Please use the new entrance" sign.
+// It warns developers at compile time, but doesn't break existing code.
+// This is how libraries evolve without breaking their users' code!
 #[deprecated(note = "use `Recovered` instead")]
 pub type RecoveredTx<T> = Recovered<T>;
 

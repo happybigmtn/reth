@@ -41,6 +41,12 @@ use tracing::*;
 /// NOTE: This stage downloads headers in reverse and pushes them to the ETL [`Collector`]. It then
 /// proceeds to push them sequentially to static files. The stage checkpoint is not updated until
 /// this stage is done.
+///
+/// LESSON 19: Headers Stage - First Step in Staged Sync
+/// This is the first stage in the sync pipeline. It downloads just the block
+/// headers (not the full blocks) from peers. Headers are lightweight and can
+/// be downloaded quickly, establishing the chain structure before we download
+/// the heavy block bodies and execute transactions.
 #[derive(Debug)]
 pub struct HeaderStage<Provider, Downloader: HeaderDownloader> {
     /// Database handle.

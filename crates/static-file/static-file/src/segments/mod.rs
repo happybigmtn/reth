@@ -16,6 +16,12 @@ use reth_storage_errors::provider::ProviderResult;
 use std::ops::RangeInclusive;
 
 /// A segment represents moving some portion of the data to static files.
+// LESSON 11: The Segment Trait
+// Each segment type (Headers, Transactions, Receipts) implements this trait.
+// The segment is responsible for:
+// 1. Reading data from the database
+// 2. Writing it to static files in the correct format
+// 3. Maintaining consistency during the migration
 pub trait Segment<Provider: StaticFileProviderFactory>: Send + Sync {
     /// Returns the [`StaticFileSegment`].
     fn segment(&self) -> StaticFileSegment;

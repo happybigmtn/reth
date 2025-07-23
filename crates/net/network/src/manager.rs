@@ -76,6 +76,14 @@ use tracing::{debug, error, trace, warn};
 /// This is an endless [`Future`] that consistently drives the state of the entire network forward.
 ///
 /// The [`NetworkManager`] is the container type for all parts involved with advancing the network.
+/// 
+/// LESSON 12: The Network Manager - Orchestrating P2P Communication
+/// The NetworkManager coordinates all networking components:
+/// - Swarm: Manages peer connections and sessions
+/// - Discovery: Finds new peers to connect to
+/// - Transaction propagation: Shares pending transactions
+/// - Block propagation: Announces new blocks
+/// - Request handling: Responds to peer requests
 ///
 /// ```mermaid
 /// graph TB

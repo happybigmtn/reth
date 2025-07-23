@@ -7,6 +7,15 @@
 //! ## Feature Flags
 //!
 //! - `alloy`: [Compact] implementation for various alloy types.
+//! 
+//! LESSON 8: Space-Efficient Encoding for Storage
+//! Reth uses custom encoding instead of RLP for database storage. Why?
+//! 1. RLP is designed for network protocol compatibility
+//! 2. Database storage can use more efficient, specialized encoding
+//! 3. We can skip unnecessary bytes (leading zeros, redundant lengths)
+//! 4. Bitflags allow packing optional fields efficiently
+//! 
+//! Key insight: Network protocols need compatibility, storage needs efficiency!
 
 #![doc(
     html_logo_url = "https://raw.githubusercontent.com/paradigmxyz/reth/main/assets/reth-docs.png",
@@ -70,6 +79,14 @@ pub mod __private;
 /// Due to the bitfields, every type change on the rust type (e.g. `U256` to `u64`) is a breaking
 /// change and will lead to a new, incompatible [`Compact`] implementation. Implementers must take
 /// special care when changing or rearranging fields.
+/// 
+/// LESSON 8: The Compact Trait - Your Gateway to Efficient Storage
+/// This trait is the foundation of Reth's storage encoding. Unlike Serde which is
+/// general-purpose, Compact is specialized for blockchain data:
+/// - to_compact: Serialize to bytes, returns bytes written
+/// - from_compact: Deserialize from bytes, returns (value, remaining_bytes)
+/// 
+/// The "remaining_bytes" pattern allows efficient parsing of concatenated values!
 pub trait Compact: Sized {
     /// Takes a buffer which can be written to. *Ideally*, it returns the length written to.
     fn to_compact<B>(&self, buf: &mut B) -> usize
@@ -146,6 +163,17 @@ impl Compact for CompactPlaceholder {
     }
 }
 
+// LESSON 8: Variable-Length Integer Encoding
+// This macro implements compact encoding for unsigned integers.
+// The key insight: Most numbers in blockchain are small!
+// 
+// Examples:
+// - 0 encodes as 0 bytes (length stored separately)
+// - 255 encodes as 1 byte: [255]
+// - 256 encodes as 2 bytes: [1, 0]
+// - 1000000 encodes as 3 bytes: [15, 66, 64]
+// 
+// We skip leading zero bytes, saving significant space!
 macro_rules! impl_uint_compact {
     ($($name:tt),+) => {
         $(
@@ -372,6 +400,15 @@ impl<T: Compact + ToOwned<Owned = T>> Compact for Cow<'_, T> {
     }
 }
 
+// LESSON 8: U256 Compact Encoding
+// U256 values in Ethereum often have many leading zeros:
+// - Most balances fit in far less than 32 bytes
+// - Gas prices are typically small numbers
+// - Even large values like 1 ETH (10^18 wei) only need 8 bytes
+// 
+// Example savings:
+// - 1 wei: 32 bytes → 1 byte (97% savings!)
+// - 1 ETH: 32 bytes → 8 bytes (75% savings!)
 impl Compact for U256 {
     #[inline]
     fn to_compact<B>(&self, buf: &mut B) -> usize
@@ -494,6 +531,16 @@ impl Compact for bool {
     }
 }
 
+// LESSON 8: Variable-Length Integer Encoding (Varint)
+// Used for encoding lengths in collections (Vec, Option with dynamic content).
+// Each byte encodes 7 bits of data + 1 continuation bit.
+// 
+// Examples:
+// - 0-127: 1 byte
+// - 128-16383: 2 bytes
+// - 16384-2097151: 3 bytes
+// 
+// This is similar to Protocol Buffers' varint encoding!
 fn encode_varuint<B>(mut n: usize, buf: &mut B)
 where
     B: bytes::BufMut + AsMut<[u8]>,

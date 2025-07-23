@@ -13,6 +13,11 @@ use crate::metrics::WalkerMetrics;
 /// `TrieWalker` is a structure that enables traversal of a Merkle trie.
 /// It allows moving through the trie in a depth-first manner, skipping certain branches
 /// if they have not changed.
+///
+/// LESSON 18: Trie Walker - Efficiently Traversing the State Tree
+/// The walker is crucial for state root calculation. It knows which parts
+/// of the trie have changed (via prefix sets) and can skip unchanged
+/// subtrees, making incremental state root calculation much faster!
 #[derive(Debug)]
 pub struct TrieWalker<C> {
     /// A mutable reference to a trie cursor instance used for navigating the trie.

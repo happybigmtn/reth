@@ -25,6 +25,12 @@ pub type PrunerWithResult<S, DB> = (Pruner<S, DB>, PrunerResult);
 pub type PrunerWithFactory<PF> = Pruner<<PF as DatabaseProviderFactory>::ProviderRW, PF>;
 
 /// Pruning routine. Main pruning logic happens in [`Pruner::run`].
+///
+/// LESSON 21: The Pruner - Managing Blockchain Data Growth
+/// This is Reth's main pruning engine that removes old blockchain data
+/// to keep storage requirements manageable. It works with different segments
+/// (accounts, storage, receipts) and can be configured to preserve data
+/// based on age, access patterns, or other criteria.
 #[derive(Debug)]
 pub struct Pruner<Provider, PF> {
     /// Provider factory. If pruner is initialized without it, it will be set to `()`.

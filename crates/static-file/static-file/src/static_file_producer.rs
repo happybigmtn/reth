@@ -32,6 +32,11 @@ pub type StaticFileProducerWithResult<Provider> =
 
 /// Static File producer. It's a wrapper around [`StaticFileProducer`] that allows to share it
 /// between threads.
+///
+/// LESSON 21: Static File Producer - Moving Data to Immutable Storage
+/// This component moves old blockchain data from the active database to
+/// compressed static files. This reduces database size while preserving
+/// data availability, working hand-in-hand with the pruner to optimize storage.
 #[derive(Debug)]
 pub struct StaticFileProducer<Provider>(Arc<Mutex<StaticFileProducerInner<Provider>>>);
 

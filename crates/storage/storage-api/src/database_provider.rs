@@ -12,6 +12,11 @@ use reth_prune_types::PruneModes;
 use reth_storage_errors::provider::ProviderResult;
 
 /// Database provider.
+///
+/// LESSON 21: Database Provider - Interface for Pruning Operations
+/// This trait provides the database interface that pruning operations use.
+/// It includes access to prune modes configuration and transaction management
+/// needed for safely removing old data while maintaining consistency.
 pub trait DBProvider: Sized {
     /// Underlying database transaction held by the provider.
     type Tx: DbTx;

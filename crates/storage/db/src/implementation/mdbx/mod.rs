@@ -1,4 +1,14 @@
 //! Module that interacts with MDBX.
+//! 
+//! LESSON 6: The MDBX Implementation Module
+//! This is the heart of Reth's storage layer. MDBX (Memory-mapped Database eXtended)
+//! provides the low-level key-value storage that powers everything in Reth.
+//! 
+//! Key concepts:
+//! - Memory-mapped I/O for zero-copy reads
+//! - B+ tree structure for efficient range queries
+//! - MVCC (Multi-Version Concurrency Control) for concurrent access
+//! - ACID transactions for data integrity
 
 use crate::{
     lockfile::StorageLock,
@@ -16,6 +26,13 @@ use reth_db_api::{
     models::ClientVersion,
     transaction::{DbTx, DbTxMut},
 };
+// LESSON 6: MDBX Bindings
+// reth_libmdbx provides safe Rust bindings to the MDBX C library.
+// Key types:
+// - Environment: The database environment (like a database connection)
+// - RO/RW: Read-only vs read-write transaction markers
+// - Geometry: Database size configuration
+// - SyncMode: Durability vs performance trade-offs
 use reth_libmdbx::{
     ffi, DatabaseFlags, Environment, EnvironmentFlags, Geometry, HandleSlowReadersReturnCode,
     MaxReadTransactionDuration, Mode, PageSize, SyncMode, RO, RW,
@@ -45,10 +62,18 @@ pub const GIGABYTE: usize = MEGABYTE * 1024;
 pub const TERABYTE: usize = GIGABYTE * 1024;
 
 /// MDBX allows up to 32767 readers (`MDBX_READERS_LIMIT`), but we limit it to slightly below that
+// LESSON 6: Reader Limits
+// MDBX supports many concurrent readers (up to 32,767), but we leave some headroom.
+// Each reader needs a slot in the reader table. Long-running readers can prevent
+// garbage collection, so it's important to close read transactions promptly.
 const DEFAULT_MAX_READERS: u64 = 32_000;
 
 /// Space that a read-only transaction can occupy until the warning is emitted.
 /// See [`reth_libmdbx::EnvironmentBuilder::set_handle_slow_readers`] for more information.
+// LESSON 6: Slow Reader Detection
+// Long-running read transactions prevent MDBX from reclaiming space. If a reader
+// holds more than 10GB of old versions, we emit a warning. This helps detect
+// problematic code that keeps transactions open too long.
 const MAX_SAFE_READER_SPACE: usize = 10 * GIGABYTE;
 
 /// Environment used when opening a MDBX environment. RO/RW.
@@ -113,7 +138,14 @@ impl DatabaseArguments {
         Self {
             client_version,
             geometry: Geometry {
+                // LESSON 6: Database Size Configuration
+                // - Initial size: 0 (grows as needed)
+                // - Maximum size: 4TB (virtual address space, not disk space!)
+                // This is just address space reservation, actual disk usage grows incrementally
                 size: Some(0..(4 * TERABYTE)),
+                // LESSON 6: Growth Strategy
+                // When the database needs more space, it grows by 4GB at a time.
+                // This reduces the frequency of expensive remapping operations.
                 growth_step: Some(4 * GIGABYTE as isize),
                 shrink_threshold: Some(0),
                 page_size: Some(PageSize::Set(default_page_size())),

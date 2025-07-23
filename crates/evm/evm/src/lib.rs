@@ -60,6 +60,12 @@ pub use alloy_evm::block::state_changes as state_change;
 
 /// A complete configuration of EVM for Reth.
 ///
+/// LESSON 16: EVM Configuration - The Execution Engine Setup
+/// This trait is the master control panel for the EVM. It defines how to:
+/// - Create EVM instances for transaction execution
+/// - Configure block execution and building
+/// - Handle different chain rules (mainnet, testnets, L2s)
+///
 /// This trait encapsulates complete configuration required for transaction execution and block
 /// execution/building, providing a unified interface for EVM operations.
 ///

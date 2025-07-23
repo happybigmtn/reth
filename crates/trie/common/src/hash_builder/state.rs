@@ -5,6 +5,11 @@ use nybbles::Nibbles;
 
 /// The hash builder state for storing in the database.
 /// Check the `reth-trie` crate for more info on hash builder.
+///
+/// LESSON 17: Hash Builder - Efficiently Computing Merkle Roots
+/// The hash builder incrementally constructs the trie's Merkle root.
+/// It maintains a stack of nodes and uses bit masks to track which
+/// children exist at each level. This avoids building the entire trie!
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 #[cfg_attr(any(test, feature = "serde"), derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(

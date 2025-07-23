@@ -1,4 +1,12 @@
 //! This crate defines abstractions to create and update payloads (blocks):
+//! 
+//! LESSON 15: Payload Building - Creating New Blocks
+//! When a validator is chosen to propose a block, the consensus layer asks the 
+//! execution layer to build a payload (block). This happens through:
+//! 1. Consensus layer sends payload attributes (timestamp, fee recipient, etc)
+//! 2. Execution layer starts building the best possible block
+//! 3. Consensus layer later retrieves the built payload
+//!
 //! - [`PayloadJobGenerator`]: a type that knows how to create new jobs for creating payloads based
 //!   on [`PayloadAttributes`](alloy_rpc_types::engine::PayloadAttributes).
 //! - [`PayloadJob`]: a type that yields (better) payloads over time.

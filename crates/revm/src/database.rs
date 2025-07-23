@@ -8,6 +8,15 @@ use revm::{bytecode::Bytecode, state::AccountInfo, Database, DatabaseRef};
 
 /// A helper trait responsible for providing state necessary for EVM execution.
 ///
+/// LESSON 16: EVM State Provider - How the EVM Reads Blockchain State
+/// When executing transactions, the EVM needs to read:
+/// - Account balances and nonces
+/// - Contract code
+/// - Storage values
+/// - Block hashes (for BLOCKHASH opcode)
+///
+/// This trait abstracts where that data comes from!
+///
 /// This serves as the data layer for [`Database`].
 pub trait EvmStateProvider: Send + Sync {
     /// Get basic account information.

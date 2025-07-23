@@ -5,6 +5,14 @@
 //! In order for a node to join the ethereum p2p network it needs to know what nodes are already
 //! part of that network. This includes public identities (public key) and addresses (where to reach
 //! them).
+//! 
+//! LESSON 12: P2P Networking - Connecting to the Ethereum Network
+//! Ethereum nodes communicate using a custom protocol stack:
+//! 1. Discovery: Finding other nodes (UDP-based)
+//! 2. RLPx: Encrypted transport layer (TCP-based)
+//! 3. Capability protocols: ETH, SNAP, etc.
+//! 
+//! This module orchestrates all networking components.
 //!
 //! ## Bird's Eye View
 //!

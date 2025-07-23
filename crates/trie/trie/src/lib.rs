@@ -2,6 +2,11 @@
 //! authenticated radix trie that is used to store key-value bindings.
 //! <https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/>
 //!
+//! LESSON 17: Merkle Patricia Trie - Ethereum's State Tree
+//! The MPT is how Ethereum proves what data exists without sharing all of it.
+//! It's like a tamper-proof filing system where changing any file changes
+//! the root "fingerprint" of the entire system!
+//!
 //! ## Feature Flags
 //!
 //! - `rayon`: uses rayon for parallel [`HashedPostState`] creation.

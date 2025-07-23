@@ -1,5 +1,13 @@
 //! Transaction Pool internals.
 //!
+//! LESSON 14: Pool Architecture - Three Subpools Working Together
+//! The pool is cleverly designed with three subpools:
+//! 1. Pending: Ready to execute NOW (correct nonce, enough balance)
+//! 2. Queued: Future transactions (nonce gap or insufficient funds)
+//! 3. BaseFee: Valid but priced below current base fee
+//!
+//! Transactions flow between pools as state changes!
+//!
 //! Incoming transactions are validated before they enter the pool first. The validation outcome can
 //! have 3 states:
 //!

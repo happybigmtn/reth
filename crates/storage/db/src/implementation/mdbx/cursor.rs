@@ -1,4 +1,9 @@
 //! Cursor wrapper for libmdbx-sys.
+//! 
+//! LESSON 9: Database Cursors - Efficient Iteration
+//! Cursors are like iterators for B+ trees. They maintain position in the tree,
+//! allowing efficient sequential access without repeated tree traversals.
+//! Think of a cursor as a "bookmark" in the database.
 
 use super::utils::*;
 use crate::{
@@ -23,6 +28,13 @@ pub type CursorRO<T> = Cursor<RO, T>;
 pub type CursorRW<T> = Cursor<RW, T>;
 
 /// Cursor wrapper to access KV items.
+// LESSON 9: Cursor Structure
+// A cursor combines:
+// 1. Position state in the B+ tree (maintained by libmdbx)
+// 2. A reusable buffer for decompression (avoids allocations)
+// 3. Type safety through PhantomData
+// 
+// The K parameter determines if this is a read-only or read-write cursor.
 #[derive(Debug)]
 pub struct Cursor<K: TransactionKind, T: Table> {
     /// Inner `libmdbx` cursor.
@@ -88,15 +100,24 @@ macro_rules! compress_to_buf_or_ref {
     };
 }
 
+// LESSON 9: Cursor Navigation Operations
+// Cursors provide multiple ways to navigate the B+ tree:
+// - first/last: Jump to extremes
+// - seek/seek_exact: Find specific keys
+// - next/prev: Sequential iteration
+// - current: Get current position
 impl<K: TransactionKind, T: Table> DbCursorRO<T> for Cursor<K, T> {
+    // Jump to the first key in the table
     fn first(&mut self) -> PairResult<T> {
         decode::<T>(self.inner.first())
     }
 
+    // Find exact key match (returns None if not found)
     fn seek_exact(&mut self, key: <T as Table>::Key) -> PairResult<T> {
         decode::<T>(self.inner.set_key(key.encode().as_ref()))
     }
 
+    // Find key or next greater key (for range queries)
     fn seek(&mut self, key: <T as Table>::Key) -> PairResult<T> {
         decode::<T>(self.inner.set_range(key.encode().as_ref()))
     }

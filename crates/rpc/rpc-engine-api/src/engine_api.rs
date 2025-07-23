@@ -45,6 +45,11 @@ const MAX_BLOB_LIMIT: usize = 128;
 /// The Engine API implementation that grants the Consensus layer access to data and
 /// functions in the Execution layer that are crucial for the consensus process.
 ///
+/// LESSON 15: Engine API - The Bridge Between Consensus and Execution
+/// This is where the magic happens! The consensus layer (beacon chain) talks to 
+/// the execution layer (Reth) through these APIs. Think of it as a telephone line
+/// between two separate systems that need to work together perfectly.
+///
 /// This type is generic over [`EngineTypes`] and intended to be used as the entrypoint for engine
 /// API processing. It can be reused by other non L1 engine APIs that deviate from the L1 spec but
 /// are still follow the engine API model.

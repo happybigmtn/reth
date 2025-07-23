@@ -63,6 +63,12 @@ pub type PipelineWithResult<N> = (Pipeline<N>, Result<ControlFlow, PipelineError
 /// # Defaults
 ///
 /// The [`DefaultStages`](crate::sets::DefaultStages) are used to fully sync reth.
+///
+/// LESSON 19: Pipeline - Orchestrating Staged Sync
+/// This is the main orchestrator for Reth's staged sync. It runs stages
+/// in sequence, handles errors by unwinding in reverse order, and manages
+/// checkpoints to allow resuming from interruptions. This makes sync
+/// robust and efficient!
 pub struct Pipeline<N: ProviderNodeTypes> {
     /// Provider factory.
     provider_factory: ProviderFactory<N>,

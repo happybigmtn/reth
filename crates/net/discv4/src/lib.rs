@@ -10,6 +10,14 @@
 //! state and drives the UDP socket. The (optional) [`Discv4`] serves as the frontend to interact
 //! with the service via a channel. Whenever the underlying table changes service produces a
 //! [`DiscoveryUpdate`] that listeners will receive.
+//! 
+//! LESSON 12: Discovery v4 - Finding Peers on the Network
+//! Discovery uses a distributed hash table (DHT) approach:
+//! 1. Nodes have 256-bit IDs (derived from their public keys)
+//! 2. Nodes are organized in buckets by XOR distance
+//! 3. PING/PONG messages verify liveness
+//! 4. FINDNODE queries discover new peers
+//! 5. Bootstrap nodes help new nodes join
 //!
 //! ## Feature Flags
 //!
