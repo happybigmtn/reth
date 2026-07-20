@@ -36,7 +36,7 @@ jobs:
           ref: edd9969338dd1798ba2e61f049c7e3a15cef53e6
           path: hivetests
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: "^1.13.1"
       - run: go version
